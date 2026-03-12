@@ -19,10 +19,8 @@ let winPatterns=[
 ];
 
 function showNameInput(){
-
 document.getElementById("modeSelect").style.display="none";
 document.getElementById("nameInput").style.display="block";
-
 }
 
 function startGame(){
@@ -61,7 +59,7 @@ return;
 
 currentPlayer=currentPlayer==="X"?"O":"X";
 
-statusText.innerHTML=(currentPlayer==="X"?player1Name:player2Name)+"'s Turn";
+statusText.innerHTML=(currentPlayer==="X"?player1Name:player2Name)+" Turn";
 
 }
 
