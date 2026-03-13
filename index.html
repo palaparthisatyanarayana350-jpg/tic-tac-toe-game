@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Tic Tac Toe</title>
+<title>Tic Tac Toe Pro</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -9,56 +10,82 @@
 
 <h1>Tic Tac Toe</h1>
 
-<!-- MODE SELECT -->
-<div id="modeSelect">
+<div id="menu">
 <h2>Select Mode</h2>
 
 <button onclick="selectMode('pvp')">Player vs Player</button>
 <button onclick="selectMode('pvc')">Player vs Computer</button>
 </div>
 
-<!-- SYMBOL SELECT -->
-<div id="symbolSelect" style="display:none">
-<h2>Choose Your Symbol</h2>
 
-<button onclick="setSymbol('X')">X</button>
-<button onclick="setSymbol('O')">O</button>
+<div id="names" style="display:none">
+
+<h2>Enter Player Names</h2>
+
+<input id="p1" placeholder="Player 1">
+<input id="p2" placeholder="Player 2">
+
+<button onclick="startPVP()">Start Game</button>
+
 </div>
 
-<!-- DIFFICULTY -->
-<div id="difficultySelect" style="display:none">
+
+<div id="symbolChoice" style="display:none">
+
+<h2>Choose Your Symbol</h2>
+
+<button onclick="chooseSymbol('X')">X</button>
+<button onclick="chooseSymbol('O')">O</button>
+
+</div>
+
+
+<div id="difficulty" style="display:none">
+
 <h2>Select Difficulty</h2>
 
 <button onclick="setDifficulty('easy')">Easy</button>
 <button onclick="setDifficulty('medium')">Medium</button>
 <button onclick="setDifficulty('hard')">Hard</button>
+
 </div>
 
-<!-- GAME AREA -->
-<div id="gameArea" style="display:none">
+
+<div id="scoreboard">
+
+<span id="player1">Player1</span> :
+<span id="score1">0</span>
+
+|
+
+<span id="player2">Player2</span> :
+<span id="score2">0</span>
+
+</div>
+
 
 <h2 id="status"></h2>
 
-<div id="scoreboard">
-Player: <span id="playerScore">0</span>
-Computer: <span id="computerScore">0</span>
-</div>
 
 <div class="board">
+
 <div class="cell"></div>
 <div class="cell"></div>
 <div class="cell"></div>
+
 <div class="cell"></div>
 <div class="cell"></div>
 <div class="cell"></div>
+
 <div class="cell"></div>
 <div class="cell"></div>
 <div class="cell"></div>
+
 </div>
 
-<button onclick="restartGame()">Restart</button>
 
-</div>
+<button onclick="restart()">Restart</button>
+<button onclick="goHome()">Back</button>
 
 <script src="script.js"></script>
 
