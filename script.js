@@ -1,16 +1,21 @@
-const cells = document.querySelectorAll(".cell");
-const statusText = document.getElementById("status");
+const cells=document.querySelectorAll(".cell")
+const status=document.getElementById("status")
 
-let mode="";
-let difficulty="";
-let playerSymbol="X";
-let computerSymbol="O";
-let currentPlayer="X";
+let mode=""
+let difficulty="easy"
 
-let gameActive=false;
+let playerSymbol="X"
+let aiSymbol="O"
 
-let playerScore=0;
-let computerScore=0;
+let currentPlayer="X"
+
+let player1="Player1"
+let player2="Player2"
+
+let score1=0
+let score2=0
+
+let gameActive=false
 
 const winPatterns=[
 [0,1,2],
@@ -21,210 +26,238 @@ const winPatterns=[
 [2,5,8],
 [0,4,8],
 [2,4,6]
-];
+]
 
-function selectMode(selected){
-mode=selected;
+function selectMode(m){
 
-document.getElementById("modeSelect").style.display="none";
-document.getElementById("symbolSelect").style.display="block";
-}
+mode=m
+document.getElementById("menu").style.display="none"
 
-function setSymbol(symbol){
-
-playerSymbol=symbol;
-computerSymbol=symbol==="X"?"O":"X";
-
-document.getElementById("symbolSelect").style.display="none";
-
-if(mode==="pvc"){
-document.getElementById("difficultySelect").style.display="block";
-}else{
-startGame();
-}
+if(m==="pvp")
+document.getElementById("names").style.display="block"
+else
+document.getElementById("symbolChoice").style.display="block"
 
 }
 
-function setDifficulty(level){
-difficulty=level;
+function startPVP(){
 
-document.getElementById("difficultySelect").style.display="none";
+player1=document.getElementById("p1").value||"Player1"
+player2=document.getElementById("p2").value||"Player2"
 
-startGame();
+document.getElementById("player1").innerText=player1
+document.getElementById("player2").innerText=player2
+
+document.getElementById("names").style.display="none"
+
+startGame()
+
+}
+
+function chooseSymbol(s){
+
+playerSymbol=s
+aiSymbol=s==="X"?"O":"X"
+
+document.getElementById("symbolChoice").style.display="none"
+document.getElementById("difficulty").style.display="block"
+
+}
+
+function setDifficulty(d){
+
+difficulty=d
+
+document.getElementById("difficulty").style.display="none"
+document.getElementById("player2").innerText="Computer"
+
+startGame()
+
 }
 
 function startGame(){
 
-document.getElementById("gameArea").style.display="block";
+gameActive=true
+currentPlayer="X"
 
-gameActive=true;
-currentPlayer="X";
+cells.forEach((cell,i)=>{
 
-statusText.innerHTML="Game Started";
+cell.innerHTML=""
+cell.classList.remove("win")
 
-cells.forEach((cell,index)=>{
-cell.innerHTML="";
-cell.classList.remove("win");
+cell.onclick=()=>move(i)
 
-cell.addEventListener("click",()=>playerMove(index));
-});
+})
 
 }
 
-function playerMove(index){
+function move(i){
 
-if(!gameActive) return;
-if(cells[index].innerHTML!=="") return;
+if(!gameActive) return
+if(cells[i].innerHTML!=="") return
 
-cells[index].innerHTML=currentPlayer;
+cells[i].innerHTML=currentPlayer
 
-if(checkWinner(currentPlayer)){
-
-handleWin(currentPlayer);
-return;
-
-}
+if(checkWinner(currentPlayer)) return
 
 if(checkDraw()){
-statusText.innerHTML="Game Draw 🤝";
-gameActive=false;
-return;
+status.innerText="Draw 🤝"
+gameActive=false
+return
 }
 
-currentPlayer=currentPlayer==="X"?"O":"X";
+currentPlayer=currentPlayer==="X"?"O":"X"
 
-if(mode==="pvc" && currentPlayer===computerSymbol){
-setTimeout(computerMove,500);
+if(mode==="pvc" && currentPlayer===aiSymbol)
+setTimeout(aiMove,400)
+
 }
 
-}
+function aiMove(){
 
-function computerMove(){
+if(!gameActive) return
 
-let move;
+let move
 
-if(difficulty==="easy"){
-move=randomMove();
-}
+if(difficulty==="easy") move=randomMove()
 
 else if(difficulty==="medium"){
-move=findWinningMove(computerSymbol);
-if(move===-1) move=findWinningMove(playerSymbol);
-if(move===-1) move=randomMove();
+
+move=findWin(aiSymbol)
+
+if(move===-1)
+move=findWin(playerSymbol)
+
+if(move===-1)
+move=randomMove()
+
 }
 
-else{
-move=minimaxMove();
-}
+else move=minimaxMove()
 
-cells[move].innerHTML=computerSymbol;
+cells[move].innerHTML=aiSymbol
 
-if(checkWinner(computerSymbol)){
-handleWin(computerSymbol);
-return;
-}
+if(checkWinner(aiSymbol)) return
 
 if(checkDraw()){
-statusText.innerHTML="Game Draw 🤝";
-gameActive=false;
-return;
+status.innerText="Draw 🤝"
+gameActive=false
+return
 }
 
-currentPlayer=playerSymbol;
+currentPlayer=playerSymbol
 
 }
 
 function randomMove(){
 
-let empty=[];
+let empty=[]
 
-cells.forEach((cell,i)=>{
-if(cell.innerHTML==="") empty.push(i);
-});
+cells.forEach((c,i)=>{
+if(c.innerHTML==="") empty.push(i)
+})
 
-return empty[Math.floor(Math.random()*empty.length)];
-
-}
-
-function findWinningMove(symbol){
-
-for(let pattern of winPatterns){
-
-let values=pattern.map(i=>cells[i].innerHTML);
-
-if(values.filter(v=>v===symbol).length===2 && values.includes("")){
-return pattern[values.indexOf("")];
-}
+return empty[Math.floor(Math.random()*empty.length)]
 
 }
 
-return -1;
+function findWin(symbol){
+
+for(let p of winPatterns){
+
+let values=p.map(i=>cells[i].innerHTML)
+
+if(values.filter(v=>v===symbol).length===2 && values.includes(""))
+return p[values.indexOf("")]
+
+}
+
+return -1
 
 }
 
 function minimaxMove(){
 
-let bestScore=-Infinity;
-let move;
+let bestScore=-Infinity
+let move
 
 cells.forEach((cell,i)=>{
 
 if(cell.innerHTML===""){
 
-cell.innerHTML=computerSymbol;
+cell.innerHTML=aiSymbol
 
-let score=minimax(false);
+let score=minimax(false)
 
-cell.innerHTML="";
+cell.innerHTML=""
 
 if(score>bestScore){
-bestScore=score;
-move=i;
+bestScore=score
+move=i
 }
 
 }
 
-});
+})
 
-return move;
+return move
 
 }
 
 function minimax(isMax){
 
-if(checkWinner(computerSymbol)) return 10;
-if(checkWinner(playerSymbol)) return -10;
-if(checkDraw()) return 0;
+if(simpleWinner(aiSymbol)) return 1
+if(simpleWinner(playerSymbol)) return -1
+if(checkDraw()) return 0
 
 if(isMax){
 
-let best=-Infinity;
+let best=-Infinity
 
 cells.forEach(cell=>{
-if(cell.innerHTML===""){
-cell.innerHTML=computerSymbol;
-best=Math.max(best,minimax(false));
-cell.innerHTML="";
-}
-});
 
-return best;
+if(cell.innerHTML===""){
+
+cell.innerHTML=aiSymbol
+best=Math.max(best,minimax(false))
+cell.innerHTML=""
+
+}
+
+})
+
+return best
 
 }else{
 
-let best=Infinity;
+let best=Infinity
 
 cells.forEach(cell=>{
+
 if(cell.innerHTML===""){
-cell.innerHTML=playerSymbol;
-best=Math.min(best,minimax(true));
-cell.innerHTML="";
-}
-});
 
-return best;
+cell.innerHTML=playerSymbol
+best=Math.min(best,minimax(true))
+cell.innerHTML=""
 
 }
+
+})
+
+return best
+
+}
+
+}
+
+function simpleWinner(player){
+
+for(let pattern of winPatterns){
+if(pattern.every(i=>cells[i].innerHTML===player))
+return true
+}
+
+return false
 
 }
 
@@ -234,60 +267,51 @@ for(let pattern of winPatterns){
 
 if(pattern.every(i=>cells[i].innerHTML===player)){
 
-pattern.forEach(i=>{
-cells[i].classList.add("win");
-});
+pattern.forEach(i=>cells[i].classList.add("win"))
 
-return true;
+status.innerText=player+" Wins 🏆"
+
+gameActive=false
+
+if(player==="X"){
+score1++
+document.getElementById("score1").innerText=score1
+}else{
+score2++
+document.getElementById("score2").innerText=score2
+}
+
+return true
 
 }
 
 }
 
-return false;
+return false
 
 }
 
 function checkDraw(){
-return [...cells].every(cell=>cell.innerHTML!=="");
-}
 
-function handleWin(player){
-
-gameActive=false;
-
-if(mode==="pvc"){
-
-if(player===playerSymbol){
-playerScore++;
-document.getElementById("playerScore").innerText=playerScore;
-statusText.innerHTML="Player Wins 🏆";
-}
-
-else{
-computerScore++;
-document.getElementById("computerScore").innerText=computerScore;
-statusText.innerHTML="Computer Wins 🤖";
-}
-
-}else{
-
-statusText.innerHTML=player+" Wins 🏆";
+return [...cells].every(c=>c.innerHTML!=="")
 
 }
 
+function restart(){
+
+cells.forEach(c=>{
+c.innerHTML=""
+c.classList.remove("win")
+})
+
+gameActive=true
+currentPlayer="X"
+status.innerText=""
+
 }
 
-function restartGame(){
+function goHome(){
 
-cells.forEach(cell=>{
-cell.innerHTML="";
-cell.classList.remove("win");
-});
-
-gameActive=true;
-currentPlayer="X";
-
-statusText.innerHTML="New Game";
+location.reload()
 
 }
